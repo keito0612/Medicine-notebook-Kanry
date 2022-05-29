@@ -8,20 +8,48 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sqflite/sql.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class AddModel extends ChangeNotifier {
   String hospitalText = "";
   String examinationText = "";
   File? imageFile;
-  File? image;
-  XFile? pickedFile;
+  XFile? _pickedFile;
+  XFile? _croppedImageFile;
+  dynamic base64ImageString;
 
   //カメラの起動
   Future getImagecamera() async {
     final picker = ImagePicker();
-    pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      imageFile = await FileController.getImagePath(pickedFile!);
+    _pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (_pickedFile != null) {
+      imageFile = await FileController.getImagePath(_pickedFile!);
+      //切り取る予定の写真を入れる
+      _croppedImageFile = _pickedFile;
+      await _cropImage(_croppedImageFile!);
+      imageFile = await FileController.getImagePath(_croppedImageFile!);
+    }
+    //DBへ保存するため、base64文字列へ変換する
+    base64ImageString =
+        Base64Helper().base64String(imageFile!.readAsBytesSync());
+    notifyListeners();
+  }
+
+  //画像を切り取る
+  Future _cropImage(XFile croppedImageFile) async {
+    var croppedFile = await ImageCropper().cropImage(
+      sourcePath: croppedImageFile.path,
+      uiSettings: [
+        IOSUiSettings(
+            hidesNavigationBar: false,
+            aspectRatioPickerButtonHidden: false,
+            doneButtonTitle: "次へ",
+            cancelButtonTitle: "キャンセル"),
+      ],
+      cropStyle: CropStyle.rectangle,
+    );
+    if (croppedFile != null) {
+      _croppedImageFile = XFile(croppedFile.path);
     }
     notifyListeners();
   }
@@ -47,14 +75,10 @@ class AddModel extends ChangeNotifier {
       throw ('診療科目を入力してください');
     }
 
-    //DBへ保存するため、base64文字列へ変換する
-    var _base64ImageString =
-        Base64Helper().base64String(imageFile!.readAsBytesSync());
-
     final medicineSave = Medicine(
         hospitalText: hospitalText,
         examinationText: examinationText,
-        image: _base64ImageString,
+        image: base64ImageString,
         time: getTime());
     //データベースに保存する
     insert(medicineSave);

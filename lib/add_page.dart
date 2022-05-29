@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/add_model.dart';
+import 'package:medicine/base_helper.dart';
 import 'package:provider/provider.dart';
 
 class AddDate extends StatelessWidget {
@@ -32,15 +33,16 @@ class AddPage extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   SizedBox(
-                    width: 100,
-                    height: 160,
+                    width: 200,
+                    height: 240,
                     child: InkWell(
                       onTap: () async {
                         //　カメラを起動
                         await model.getImagecamera();
                       },
                       child: model.imageFile != null
-                          ? Image.file(model.imageFile!)
+                          ? Base64Helper()
+                              .imageFromBase64String(model.base64ImageString)
                           : Container(
                               child: const Icon(Icons.camera_alt),
                               color: Colors.grey,

@@ -26,8 +26,8 @@ class EditPage extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   SizedBox(
-                    width: 100,
-                    height: 160,
+                    width: 200,
+                    height: 240,
                     child: InkWell(
                       onTap: () async {
                         //　カメラを起動
@@ -110,7 +110,7 @@ class EditPage extends StatelessWidget {
                     height: 50,
                     width: 200,
                     child: ElevatedButton(
-                        child: const Text('追加'),
+                        child: const Text('編集'),
                         style: ElevatedButton.styleFrom(
                           primary: Colors.pink[100],
                         ),
@@ -142,14 +142,14 @@ class EditPage extends StatelessWidget {
               TextButton(
                 child: const Text("OK"),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.popUntil(context, (route) => route.isFirst);
                 },
               ),
             ],
           );
         },
       );
-      Navigator.pop(context);
+      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       await showDialog(
         context: context,

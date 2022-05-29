@@ -22,14 +22,14 @@ class EditModel extends ChangeNotifier {
   String? image;
   int? id;
   File? imageFile;
-  XFile? pickedFile;
+  XFile? _pickedFile;
 
   //カメラの起動
   Future getImagecamera() async {
     final picker = ImagePicker();
-    pickedFile = await picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      imageFile = await FileController.getImagePath(pickedFile!);
+    _pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (_pickedFile != null) {
+      imageFile = await FileController.getImagePath(_pickedFile!);
       final baseImage =
           Base64Helper().base64String(imageFile!.readAsBytesSync());
       image = baseImage;

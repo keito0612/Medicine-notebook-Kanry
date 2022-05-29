@@ -91,6 +91,7 @@ class ListHome extends StatelessWidget {
                                             fullscreenDialog: true,
                                           ),
                                         );
+                                        model.getList();
                                       },
                                       child: medicine.image != null
                                           ? SizedBox(
@@ -148,10 +149,12 @@ class ListHome extends StatelessWidget {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => Photo(
-                                                medicineImage: medicine.image),
+                                              medicineImage: medicine.image,
+                                            ),
                                             fullscreenDialog: true,
                                           ),
                                         );
+                                        model.getList();
                                       },
                                       //写真
                                       child: medicine.image != null
