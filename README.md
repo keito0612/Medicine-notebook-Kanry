@@ -1,22 +1,9 @@
-# medicine
+# アプリケーション名　　   
+「お薬手帳アプリKanry」
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# Kanry
-# Kanry
-# Kanry
-# Kanry
-# Kanry
-# medicine
+## アプリケーション概要　　　　
+手軽にお薬の情報が載った紙を写真で撮って簡単に管理するアプリ
+### 利用方法	
+画面のプラスボタンを押して追加画面に行きます。そしてカメラマークがある四角のボタンを押すとカメラが起動して写真を撮ることができます。撮り終わったら、病院名、診察科目を入力して、追加下の追加ボタンを押せばお薬の追加が完了します。追加したものは、リストに表示され横に、撮影した写真が表示されます。横にある写真を押すと拡大することができ、相手に見せることができます。
+#### 目指した課題解決
+病院で毎回貰うお薬の情報が載った紙が嵩張る問題と病院に次回病院にいく時にお薬手帳を忘れる問題があったので、この問題の解決を目指しました。
