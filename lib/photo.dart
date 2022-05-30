@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:medicine/edit_page.dart';
 
 class Photo extends StatelessWidget {
   Photo({this.medicineImage});

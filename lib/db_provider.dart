@@ -29,8 +29,6 @@ class DBProvider {
         await db.execute(
             // テーブルの作成
             "CREATE TABLE medicine (id INTEGER PRIMARY KEY AUTOINCREMENT,hospitalText TEXT ,examinationText TEXT,time TEXT,image TEXT)");
-        await db.execute(
-            "CREATE TABLE schedule (id INTEGER PRIMARY KEY AUTOINCREMENT,scheduleName TEXT, startTime TEXT, endTime TEXT, memo TEXT ,background INTEGER,isAllDay TEXT)");
       },
       version: 1,
     );
