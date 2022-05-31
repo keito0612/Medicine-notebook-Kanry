@@ -20,7 +20,7 @@ class MainModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future search(String keyword) async {
+  void search(String keyword) {
     if (keyword == "") {
       searchList = medicineList;
       notifyListeners();
