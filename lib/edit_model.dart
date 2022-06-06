@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:medicine/base_helper.dart';
 import 'package:medicine/db_provider.dart';
 import 'package:medicine/file_conroller.dart';
@@ -21,6 +22,7 @@ class EditModel extends ChangeNotifier {
   String? examinationText;
   String? image;
   int? id;
+  XFile? _croppedImageFile;
   File? imageFile;
   XFile? _pickedFile;
 
@@ -30,9 +32,32 @@ class EditModel extends ChangeNotifier {
     _pickedFile = await picker.pickImage(source: ImageSource.camera);
     if (_pickedFile != null) {
       imageFile = await FileController.getImagePath(_pickedFile!);
+      //切り取る予定の写真を入れる
+      _croppedImageFile = _pickedFile;
+      await _cropImage(_croppedImageFile!);
+      imageFile = await FileController.getImagePath(_croppedImageFile!);
       final baseImage =
           Base64Helper().base64String(imageFile!.readAsBytesSync());
       image = baseImage;
+    }
+    notifyListeners();
+  }
+
+  //画像を切り取る
+  Future _cropImage(XFile croppedImageFile) async {
+    var croppedFile = await ImageCropper().cropImage(
+      sourcePath: croppedImageFile.path,
+      uiSettings: [
+        IOSUiSettings(
+            hidesNavigationBar: false,
+            aspectRatioPickerButtonHidden: false,
+            doneButtonTitle: "次へ",
+            cancelButtonTitle: "キャンセル"),
+      ],
+      cropStyle: CropStyle.rectangle,
+    );
+    if (croppedFile != null) {
+      _croppedImageFile = XFile(croppedFile.path);
     }
     notifyListeners();
   }

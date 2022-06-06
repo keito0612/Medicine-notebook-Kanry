@@ -155,7 +155,7 @@ class EditPage extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('${e}:更新できませんでした'),
+            title: Text('更新できませんでした'),
             actions: <Widget>[
               TextButton(
                 child: const Text("OK"),
