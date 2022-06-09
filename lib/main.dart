@@ -18,6 +18,11 @@ void main() {
   runApp(ListApp());
 }
 
+enum MenuItem {
+  item1,
+  item2,
+}
+
 class ListApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -52,6 +57,23 @@ class ListHome extends StatelessWidget {
             appBar: AppBar(
               title: const Text('お薬手帳リスト'),
               backgroundColor: Colors.pink[100],
+              actions: [
+                PopupMenuButton<MenuItem>(
+                    icon: const Icon(Icons.sort),
+                    onSelected: (value) {
+                      if (value == MenuItem.item1) {
+                        model.sortList(value);
+                      } else if (value == MenuItem.item2) {
+                        model.sortList(value);
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                          PopupMenuItem(
+                              value: MenuItem.item1, child: Text('日付が小さい順')),
+                          PopupMenuItem(
+                              value: MenuItem.item2, child: Text('日付が大きい順'))
+                        ]),
+              ],
             ),
             body: Column(
               children: [

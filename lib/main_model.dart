@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/db_provider.dart';
+import 'package:medicine/main.dart';
 import 'package:medicine/medicine.dart';
 
 class MainModel extends ChangeNotifier {
@@ -17,6 +18,18 @@ class MainModel extends ChangeNotifier {
   Future delete(int id) async {
     final db = await DBProvider.db.database;
     await db.delete('medicine', where: "id = ?", whereArgs: [id]);
+    notifyListeners();
+  }
+
+  void sortList(MenuItem item) {
+    if (item == MenuItem.item1) {
+      final sortDataList = medicineList
+        ..sort(((a, b) => a.id!.compareTo(b.id!)));
+      medicineList = sortDataList;
+    } else if (item == MenuItem.item2) {
+      final sortDataList = medicineList
+        ..sort(((a, b) => b.id!.compareTo(a.id!)));
+    }
     notifyListeners();
   }
 
