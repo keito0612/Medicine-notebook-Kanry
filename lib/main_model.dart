@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:medicine/db_provider.dart';
-import 'package:medicine/main.dart';
+import 'package:medicine/main.dart' as meunitem;
 import 'package:medicine/medicine.dart';
 
 class MainModel extends ChangeNotifier {
+  bool loading = false;
   List<Medicine> medicineList = [];
   List<Medicine> searchList = [];
+
   Future getList() async {
     final db = await DBProvider.db.database;
     var res = await db.query('medicine');
     print('data:$res');
     //データの読み込み
     medicineList = res.map((data) => Medicine.fromMap(data)).toList();
+    searchList = medicineList;
     notifyListeners();
   }
 
@@ -21,24 +24,35 @@ class MainModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void sortList(MenuItem item) {
-    if (item == MenuItem.item1) {
+  void isLoading() {
+    loading = true;
+    notifyListeners();
+  }
+
+  void isReloading() {
+    loading = false;
+    notifyListeners();
+  }
+
+  void sortList(item) {
+    if (item == meunitem.SortItem.oldItem) {
       final sortDataList = medicineList
         ..sort(((a, b) => a.id!.compareTo(b.id!)));
       medicineList = sortDataList;
-    } else if (item == MenuItem.item2) {
+    } else if (item == meunitem.SortItem.newItem) {
       final sortDataList = medicineList
         ..sort(((a, b) => b.id!.compareTo(a.id!)));
+      medicineList = sortDataList;
     }
     notifyListeners();
   }
 
   void search(String keyword) {
     if (keyword == "") {
-      searchList = medicineList;
+      searchList;
       notifyListeners();
     } else {
-      searchList = medicineList
+      medicineList = searchList
           .where((data) =>
               data.hospitalText!.contains(keyword) ||
               data.examinationText!.contains(keyword))

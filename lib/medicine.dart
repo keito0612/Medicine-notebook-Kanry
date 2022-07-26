@@ -7,10 +7,10 @@ class Medicine {
 
   Medicine(
       {this.id,
-      this.hospitalText,
-      this.examinationText,
-      this.time,
-      this.image});
+      required this.hospitalText,
+      required this.examinationText,
+      required this.time,
+      required this.image});
 
   /// Map型に変換
   Map<String, dynamic> toMap() {

@@ -22,6 +22,7 @@ class AddPage extends StatelessWidget {
     return ChangeNotifierProvider<AddModel>.value(
       value: AddModel(),
       child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 255, 224, 234),
         appBar: AppBar(
           title: const Text('追加'),
           backgroundColor: Colors.pink[100],
@@ -29,7 +30,7 @@ class AddPage extends StatelessWidget {
         body: Consumer<AddModel>(builder: (context, model, child) {
           return SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 children: <Widget>[
                   SizedBox(
@@ -74,6 +75,7 @@ class AddPage extends StatelessWidget {
                           decoration: const InputDecoration(
                             labelText: '病院名',
                             hintText: '〇〇病院',
+                            border: InputBorder.none,
                             enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Color.fromARGB(255, 246, 209, 222),
@@ -98,6 +100,7 @@ class AddPage extends StatelessWidget {
                           decoration: const InputDecoration(
                               labelText: '診療科目',
                               hintText: '皮膚科',
+                              border: InputBorder.none,
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Color.fromARGB(255, 246, 209, 222),

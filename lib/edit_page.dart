@@ -15,6 +15,7 @@ class EditPage extends StatelessWidget {
     return ChangeNotifierProvider<EditModel>(
       create: (_) => EditModel(hospitalText, examinationText, image, id),
       child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 255, 224, 234),
         appBar: AppBar(
           title: const Text('編集'),
           backgroundColor: Colors.pink[100],
@@ -22,7 +23,7 @@ class EditPage extends StatelessWidget {
         body: Consumer<EditModel>(builder: (context, model, child) {
           return SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 children: <Widget>[
                   SizedBox(
@@ -65,6 +66,7 @@ class EditPage extends StatelessWidget {
                           decoration: const InputDecoration(
                             labelText: '病院名',
                             hintText: '〇〇病院',
+                            border: InputBorder.none,
                             enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Color.fromARGB(255, 246, 209, 222),
@@ -90,6 +92,7 @@ class EditPage extends StatelessWidget {
                           decoration: const InputDecoration(
                               labelText: '診療科目',
                               hintText: '皮膚科',
+                              border: InputBorder.none,
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(
                                     color: Color.fromARGB(255, 246, 209, 222),

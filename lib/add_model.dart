@@ -65,7 +65,7 @@ class AddModel extends ChangeNotifier {
   //追加
   Future add() async {
     if (imageFile == null) {
-      throw ('写真が取られていません');
+      throw ('写真がありません');
     }
     if (examinationText.isEmpty && hospitalText.isEmpty) {
       throw ('病院名と診察科目を入力してください');

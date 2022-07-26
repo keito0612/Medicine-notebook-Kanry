@@ -1,39 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:medicine/base_helper.dart';
+import 'package:medicine/calendar.dart';
 import 'package:medicine/edit_page.dart';
 import 'package:medicine/main_model.dart';
 import 'package:medicine/medicine.dart';
 import 'package:medicine/photo.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 import 'add_page.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp, //縦固定
   ]);
-  runApp(ListApp());
+  tz.initializeTimeZones();
+  await _configureLocalTimeZone();
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  const IOSInitializationSettings initializationSettingsIOS =
+      IOSInitializationSettings(
+    requestSoundPermission: true,
+    requestBadgePermission: true,
+    requestAlertPermission: true,
+  );
+  //initializationSettingsのオブジェクト作成
+  const InitializationSettings initializationSettings = InitializationSettings(
+    iOS: initializationSettingsIOS,
+    android: null,
+  );
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+  );
+  runApp(MainApp());
 }
 
-enum MenuItem {
-  item1,
-  item2,
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String? timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+  tz.setLocalLocation(tz.getLocation(timeZoneName!));
 }
 
-class ListApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
+  @override
+  State<MainApp> createState() => MainAppState();
+}
+
+class MainAppState extends State<MainApp> {
   // This widget is the root of your application.
+  int _selectedIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> _selectedPage = [ListPage(), CalendarPage()];
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'お薬手帳リスト',
       theme: ThemeData(
         backgroundColor: Colors.pink[100],
       ),
-      home: ListHome(),
+      home: Scaffold(
+        body: _selectedPage[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          unselectedLabelStyle:
+              const TextStyle(color: Colors.white, fontSize: 14),
+          fixedColor: Colors.pink[100],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'リスト',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: 'カレンダー',
+            ),
+          ],
+        ),
+      ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -46,207 +108,293 @@ class ListApp extends StatelessWidget {
   }
 }
 
-class ListHome extends StatelessWidget {
+enum SortItem {
+  newItem,
+  oldItem,
+}
+
+class ListPage extends StatelessWidget {
   String searchText = "";
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<MainModel>(
         create: (_) => MainModel()..getList(),
         child: Consumer<MainModel>(builder: (context, model, child) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('お薬手帳リスト'),
-              backgroundColor: Colors.pink[100],
-              actions: [
-                PopupMenuButton<MenuItem>(
-                    icon: const Icon(Icons.sort),
-                    onSelected: (value) {
-                      if (value == MenuItem.item1) {
-                        model.sortList(value);
-                      } else if (value == MenuItem.item2) {
-                        model.sortList(value);
-                      }
-                    },
-                    itemBuilder: (context) => const [
-                          PopupMenuItem(
-                              value: MenuItem.item1, child: Text('日付が小さい順')),
-                          PopupMenuItem(
-                              value: MenuItem.item2, child: Text('日付が大きい順'))
-                        ]),
-              ],
-            ),
-            body: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    onChanged: (_seartchText) {
-                      searchText = _seartchText;
-                      model.search(searchText);
-                    },
-                    decoration: const InputDecoration(
-                      hintText: "病院名または診察科目を検索",
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(25.0))),
-                    ),
-                  ),
-                ),
-                Consumer<MainModel>(builder: (context, model, child) {
-                  if (searchText == "") {
-                    return Expanded(
-                      child: ListView(
-                          children: model.medicineList
-                              .map(
-                                (medicine) => Card(
-                                    child: ListTile(
-                                  tileColor: Colors.pink[100],
-                                  //リストに画像を表示する。
-                                  leading: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => Photo(
-                                                medicineImage: medicine.image),
-                                            fullscreenDialog: true,
-                                          ),
-                                        );
-                                        model.getList();
-                                      },
-                                      child: medicine.image != null
-                                          ? SizedBox(
-                                              width: 45,
-                                              height: 50,
-                                              child: Base64Helper()
-                                                  .imageFromBase64String(
-                                                      medicine.image!))
-                                          : Container(
-                                              width: 45,
-                                              height: 50,
-                                              color: Colors.grey)),
-                                  title: Text(
-                                      '病院名:${medicine.hospitalText}\n診察科目:${medicine.examinationText}\n日付:${medicine.time}'),
-                                  textColor: Colors.white,
-                                  onLongPress: () async {
-                                    //削除
-                                    await deleteDialog(
-                                        model, context, medicine);
-                                  },
-                                  //編集ボタン
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditPage(
-                                              medicine.hospitalText!,
-                                              medicine.examinationText!,
-                                              medicine.image!,
-                                              medicine.id!),
-                                          fullscreenDialog: true,
-                                        ),
-                                      );
-                                      model.getList();
-                                    },
-                                  ),
-                                )),
-                              )
-                              .toList()),
-                    );
-                  } else {
-                    return Expanded(
-                      child: ListView(
-                          children: model.searchList
-                              .map(
-                                (medicine) => Card(
-                                    child: ListTile(
-                                  tileColor: Colors.pink[100],
-                                  //リストに画像を表示する。
-                                  leading: InkWell(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => Photo(
-                                              medicineImage: medicine.image,
-                                            ),
-                                            fullscreenDialog: true,
-                                          ),
-                                        );
-                                        model.getList();
-                                      },
-                                      //写真
-                                      child: medicine.image != null
-                                          ? SizedBox(
-                                              width: 45,
-                                              height: 50,
-                                              child: Base64Helper()
-                                                  .imageFromBase64String(
-                                                      medicine.image!))
-                                          : Container(
-                                              width: 45,
-                                              height: 50,
-                                              color: Colors.grey)),
-                                  title: Text(
-                                      '病院名:${medicine.hospitalText}\n診察科目:${medicine.examinationText}\n日付:${medicine.time}'),
-                                  textColor: Colors.white,
-                                  onLongPress: () async {
-                                    //削除
-                                    await deleteDialog(
-                                        model, context, medicine);
-                                  },
-                                  //編集ボタン
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditPage(
-                                              medicine.hospitalText!,
-                                              medicine.examinationText!,
-                                              medicine.image!,
-                                              medicine.id!),
-                                          fullscreenDialog: true,
-                                        ),
-                                      );
-                                      model.getList();
-                                    },
-                                  ),
-                                )),
-                              )
-                              .toList()),
-                    );
-                  }
-                }),
-              ],
-            ),
-            floatingActionButton: Consumer<MainModel>(
-              builder: (context, model, child) {
-                return FloatingActionButton(
+          return Stack(
+            children: [
+              Scaffold(
+                appBar: AppBar(
+                  title: const Text('お薬手帳リスト'),
                   backgroundColor: Colors.pink[100],
-                  onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddPage(),
-                        fullscreenDialog: true,
+                  actions: [
+                    PopupMenuButton<SortItem>(
+                        icon: const Icon(Icons.sort),
+                        onSelected: (value) {
+                          if (value == SortItem.oldItem) {
+                            model.sortList(value);
+                          } else if (value == SortItem.newItem) {
+                            model.sortList(value);
+                          }
+                        },
+                        itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                  value: SortItem.oldItem, child: Text('古い順')),
+                              PopupMenuItem(
+                                  value: SortItem.newItem, child: Text('新しい順'))
+                            ]),
+                  ],
+                ),
+                body: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (_seartchText) {
+                          searchText = _seartchText;
+                          model.search(searchText);
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "病院名または診察科目を検索",
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(25.0))),
+                        ),
                       ),
-                    ).then((e) {
-                      //画面が戻ったら処理が発動する
-                      model.getList();
-                    });
+                    ),
+                    Consumer<MainModel>(builder: (context, model, child) {
+                      if (searchText == "") {
+                        return Expanded(
+                          child: ListView(
+                              children: model.medicineList
+                                  .map(
+                                    (medicine) => Card(
+                                        elevation: 20.0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Slidable(
+                                          endActionPane: ActionPane(
+                                            motion: const ScrollMotion(),
+                                            children: [
+                                              //削除ボタン
+                                              SlidableAction(
+                                                  flex: 1,
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor: Colors.white,
+                                                  icon: Icons.delete,
+                                                  label: '削除',
+                                                  onPressed: (BuildContext
+                                                      context) async {
+                                                    await deleteDialog(model,
+                                                        context, medicine);
+                                                  }),
+                                              //編集ボタン
+                                              SlidableAction(
+                                                flex: 1,
+                                                backgroundColor: Colors.brown,
+                                                foregroundColor: Colors.white,
+                                                icon: Icons.edit,
+                                                label: '編集',
+                                                onPressed: (BuildContext
+                                                    context) async {
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => EditPage(
+                                                          medicine
+                                                              .hospitalText!,
+                                                          medicine
+                                                              .examinationText!,
+                                                          medicine.image!,
+                                                          medicine.id!),
+                                                      fullscreenDialog: true,
+                                                    ),
+                                                  );
+                                                  model.isLoading();
+                                                  await model.getList();
+                                                  model.isReloading();
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                          child: ListTile(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10)),
+                                            tileColor: Colors.pink[100],
+                                            //リストに画像を表示する。
+                                            leading: InkWell(
+                                                onTap: () async {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Photo(
+                                                              medicineImage:
+                                                                  medicine
+                                                                      .image),
+                                                      fullscreenDialog: true,
+                                                    ),
+                                                  );
+                                                  model.isLoading();
+                                                  await model.getList();
+                                                  model.isReloading();
+                                                },
+                                                child: medicine.image != null
+                                                    ? SizedBox(
+                                                        width: 45,
+                                                        height: 50,
+                                                        child: Base64Helper()
+                                                            .imageFromBase64String(
+                                                                medicine
+                                                                    .image!))
+                                                    : Container(
+                                                        width: 45,
+                                                        height: 50,
+                                                        color: Colors.grey)),
+                                            title: Text(
+                                                '病院名:${medicine.hospitalText}\n診察科目:${medicine.examinationText}\n日付:${medicine.time}'),
+                                            textColor: Colors.white,
+                                          ),
+                                        )),
+                                  )
+                                  .toList()),
+                        );
+                      } else {
+                        return Expanded(
+                          child: ListView(
+                              children: model.searchList
+                                  .map(
+                                    (medicine) => Card(
+                                        child: Slidable(
+                                      endActionPane: ActionPane(
+                                        motion: const ScrollMotion(),
+                                        children: [
+                                          //削除ボタン
+                                          SlidableAction(
+                                              flex: 1,
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                              icon: Icons.delete,
+                                              label: '削除',
+                                              onPressed:
+                                                  (BuildContext context) async {
+                                                await deleteDialog(
+                                                    model, context, medicine);
+                                              }),
+                                          //編集ボタン
+                                          SlidableAction(
+                                            flex: 1,
+                                            backgroundColor: Colors.brown,
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.edit,
+                                            label: '編集',
+                                            onPressed:
+                                                (BuildContext context) async {
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EditPage(
+                                                          medicine
+                                                              .hospitalText!,
+                                                          medicine
+                                                              .examinationText!,
+                                                          medicine.image!,
+                                                          medicine.id!),
+                                                  fullscreenDialog: true,
+                                                ),
+                                              );
+                                              model.isLoading();
+                                              await model.getList();
+                                              model.isReloading();
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                      child: ListTile(
+                                        tileColor: Colors.pink[100],
+                                        //リストに画像を表示する。
+                                        leading: InkWell(
+                                            onTap: () async {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Photo(
+                                                    medicineImage:
+                                                        medicine.image,
+                                                  ),
+                                                  fullscreenDialog: true,
+                                                ),
+                                              );
+                                              model.isLoading();
+                                              await model.getList();
+                                              model.isReloading();
+                                            },
+                                            //写真
+                                            child: medicine.image != null
+                                                ? SizedBox(
+                                                    width: 45,
+                                                    height: 50,
+                                                    child: Base64Helper()
+                                                        .imageFromBase64String(
+                                                            medicine.image!))
+                                                : Container(
+                                                    width: 45,
+                                                    height: 50,
+                                                    color: Colors.grey)),
+                                        title: Text(
+                                            '病院名:${medicine.hospitalText}\n診察科目:${medicine.examinationText}\n日付:${medicine.time}'),
+                                        textColor: Colors.white,
+                                      ),
+                                    )),
+                                  )
+                                  .toList()),
+                        );
+                      }
+                    }),
+                  ],
+                ),
+                floatingActionButton: Consumer<MainModel>(
+                  builder: (context, model, child) {
+                    return FloatingActionButton(
+                      backgroundColor: Colors.pink[100],
+                      onPressed: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddPage(),
+                            fullscreenDialog: true,
+                          ),
+                        ).then((e) async {
+                          //画面が戻ったら処理が発動する
+                          model.isLoading();
+                          await model.getList();
+                          model.isReloading();
+                        });
+                      },
+                      tooltip: '追加する',
+                      child: const Icon(Icons.add),
+                    );
                   },
-                  tooltip: '追加する',
-                  child: const Icon(Icons.add),
-                );
-              },
-            ),
+                ),
+              ),
+              if (model.loading) showIndicator(context)
+            ],
           );
         }));
+  }
+
+  //インジゲータ
+  Widget showIndicator(BuildContext context) {
+    return const ColoredBox(
+      color: Colors.black54,
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 
   //削除ダイアログ
@@ -267,11 +415,10 @@ class ListHome extends StatelessWidget {
               },
             ),
             TextButton(
-              child: const Text('いいえ'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            )
+                child: const Text('いいえ'),
+                onPressed: () async {
+                  Navigator.pop(context);
+                })
           ],
         );
       },
