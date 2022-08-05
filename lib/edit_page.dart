@@ -26,6 +26,30 @@ class EditPage extends StatelessWidget {
               padding: const EdgeInsets.all(14),
               child: Column(
                 children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        //写真の枠線
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        const Text(
+                          '写真',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          height: 3,
+                          width: 310,
+                          color: const Color.fromARGB(255, 190, 184, 184),
+                        ),
+                      ],
+                    ),
+                  ),
                   SizedBox(
                     width: 200,
                     height: 240,
@@ -42,6 +66,47 @@ class EditPage extends StatelessWidget {
                   ),
                   const SizedBox(
                     height: 20,
+                  ),
+                  //枠線
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          height: 3,
+                          width: 350,
+                          color: const Color.fromARGB(255, 190, 184, 184),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //病院名/診察科目の枠線
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        const Text(
+                          '病院名/診察科目',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Container(
+                          height: 3,
+                          width: 220,
+                          color: const Color.fromARGB(255, 190, 184, 184),
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     width: 360,
@@ -106,8 +171,22 @@ class EditPage extends StatelessWidget {
                       ),
                     ]),
                   ),
-                  const SizedBox(
-                    height: 30,
+                  //枠線
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          height: 3,
+                          width: 350,
+                          color: const Color.fromARGB(255, 190, 184, 184),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 50,
@@ -158,7 +237,7 @@ class EditPage extends StatelessWidget {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('更新できませんでした'),
+            title: const Text('更新できませんでした'),
             actions: <Widget>[
               TextButton(
                 child: const Text("OK"),
