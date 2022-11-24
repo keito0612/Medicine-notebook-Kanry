@@ -20,6 +20,7 @@ class CalendarState extends State<CalendarPage> {
   final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay = DateTime.now();
+  final DateTime _today = DateTime.now();
   Map<DateTime, List> _eventsList = {};
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -29,13 +30,14 @@ class CalendarState extends State<CalendarPage> {
     await initializeDateFormatting("ja_JP");
     final db = await DBProvider.db.database;
     final res = await db.query('event');
-    print('data:$res');
     //データの読み込み
     if (mounted) {
       setState(() {
         final eventsList = res.map((data) => Event.fromMap(data)).toList();
-        if (eventsList != null) {
+        if (eventsList.isNotEmpty) {
           _getEvents(eventsList);
+        } else {
+          _eventsList = {};
         }
       });
     }
@@ -60,7 +62,12 @@ class CalendarState extends State<CalendarPage> {
       final time = _formatter.parse(event.timeText!);
       DateTime date = DateTime.utc(time.year, time.month, time.day, time.hour);
       if (_eventsList[date] == null) _eventsList[date] = [];
-      _eventsList[date]!.add(event);
+      //今日の日付より前の日だったら消す。
+      if (date.isBefore(_today)) {
+        _delete(event.id!);
+      } else {
+        _eventsList[date]!.add(event);
+      }
     });
   }
 
@@ -78,18 +85,6 @@ class CalendarState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     List _getEventForDay(DateTime day) {
       return _eventsList[day] ?? [];
-    }
-
-    Color _textColor(DateTime day) {
-      const _defaultTextColor = Colors.black87;
-
-      if (day.weekday == DateTime.sunday) {
-        return Colors.red;
-      }
-      if (day.weekday == DateTime.saturday) {
-        return Colors.blue[600]!;
-      }
-      return _defaultTextColor;
     }
 
     return Scaffold(
@@ -113,11 +108,11 @@ class CalendarState extends State<CalendarPage> {
       ),
       body: Column(
         children: [
+          //カレンダー
           Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(40),
             ),
-            //カレンダー
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(40),
@@ -130,7 +125,12 @@ class CalendarState extends State<CalendarPage> {
                 focusedDay: _focusedDay,
                 eventLoader: _getEventForDay, //追記
                 calendarFormat: _calendarFormat,
-                headerStyle: const HeaderStyle(formatButtonVisible: false),
+                headerStyle: const HeaderStyle(
+                    formatButtonVisible: false,
+                    leftChevronIcon:
+                        Icon(Icons.chevron_left, color: Colors.white),
+                    rightChevronIcon:
+                        Icon(Icons.chevron_right, color: Colors.white)),
                 calendarStyle: const CalendarStyle(
                   todayDecoration: BoxDecoration(
                       color: Color.fromARGB(255, 255, 194, 249),
@@ -262,7 +262,7 @@ class CalendarState extends State<CalendarPage> {
   }
 
   //削除ダイアログ
-  Future deleteDialog(BuildContext context, dynamic event) async {
+  Future deleteDialog(BuildContext context, Event event) async {
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -272,7 +272,9 @@ class CalendarState extends State<CalendarPage> {
             TextButton(
               child: const Text("はい"),
               onPressed: () async {
-                await _cancelNotifiacation(event.notificationId);
+                if (event.notificationId != null) {
+                  await _cancelNotifiacation(event.notificationId!);
+                }
                 await _delete(event.id!);
                 await getEventList();
                 setState(() {});
