@@ -22,13 +22,24 @@ class Photo extends StatelessWidget {
         ),
         body: SingleChildScrollView(
           child: Column(children: [
-            Center(
-              child: InteractiveViewer(
-                  child: Image.memory(base64Decode(medicineImage!),
-                      fit: BoxFit.fill)),
-            ),
+            medicineImage != null
+                ? Center(
+                    child: InteractiveViewer(
+                        child: Image.memory(base64Decode(medicineImage!),
+                            fit: BoxFit.cover)),
+                  )
+                : showIndicator(context)
           ]),
         ),
+      ),
+    );
+  }
+
+  Widget showIndicator(BuildContext context) {
+    return const ColoredBox(
+      color: Colors.black54,
+      child: Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }
