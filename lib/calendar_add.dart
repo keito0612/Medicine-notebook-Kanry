@@ -128,6 +128,7 @@ class CalendarAddPage extends StatelessWidget {
                                         ),
                                         Expanded(
                                           child: CupertinoDatePicker(
+                                            minimumDate: todayTime,
                                             initialDateTime: todayTime,
                                             use24hFormat: true,
                                             mode: CupertinoDatePickerMode
@@ -229,8 +230,6 @@ class CalendarAddPage extends StatelessWidget {
                                                   .toList(),
                                               onSelectedItemChanged:
                                                   (int index) {
-                                                print(notificationTimebars[
-                                                    index]);
                                                 model.settingNotification(
                                                     notificationTimebars[
                                                         index]);
@@ -353,7 +352,7 @@ class CalendarAddPage extends StatelessWidget {
                         child: ElevatedButton(
                             child: const Text('追加'),
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.pink[100],
+                              backgroundColor: Colors.pink[100],
                             ),
                             onPressed: () async {
                               //お薬手帳を追加する

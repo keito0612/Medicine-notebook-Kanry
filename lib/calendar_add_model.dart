@@ -17,6 +17,7 @@ class CalendarAddModel extends ChangeNotifier {
   String timeText = '';
   List<int>? notificationIdList;
   int? notificationId;
+  final formatter = DateFormat('yyyy/MM/dd(E) HH:mm', "ja");
 
   void onChecked(bool value) {
     isOn = value;
@@ -27,7 +28,6 @@ class CalendarAddModel extends ChangeNotifier {
     notificationId = Random().nextInt(10000);
     final db = await DBProvider.db.database;
     var res = await db.query('event');
-    print('data:$res');
     notificationIdList != null
         ? res.map((data) => Event.fromMap(data).notificationId!).toList()
         : null;
@@ -42,7 +42,7 @@ class CalendarAddModel extends ChangeNotifier {
   void settingTime(DateTime dateTime) {
     initializeDateFormatting("ja_JP");
     _time = dateTime;
-    final time = DateFormat('yyyy/MM/dd(E) HH:mm', "ja").format(dateTime);
+    final time = formatter.format(dateTime);
     timeText = time;
     notifyListeners();
   }
@@ -80,6 +80,8 @@ class CalendarAddModel extends ChangeNotifier {
   Future _setNotify({int? id, DateTime? time}) async {
     final scheduleTime = tz.TZDateTime(
         tz.local, time!.year, time.month, time.day, time.hour, time.minute);
+    final now = DateTime.now();
+    final presentTime = formatter.format(now);
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     const IOSNotificationDetails iOSPlatformChannelSpecifics =
@@ -89,15 +91,17 @@ class CalendarAddModel extends ChangeNotifier {
       iOS: iOSPlatformChannelSpecifics,
       android: null,
     );
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        id!,
-        'お薬手アプリKanry',
-        '$notificationTime後に以下の予定があります。\n$titleText',
-        scheduleTime,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+    if (scheduleTime.isAfter(now)) {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+          id!,
+          'お薬手アプリKanry',
+          '${notificationTime.replaceAll("前", "")}後に以下の予定があります。\n$titleText',
+          scheduleTime,
+          platformChannelSpecifics,
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime);
+    }
   }
 
   Future add() async {
@@ -118,7 +122,7 @@ class CalendarAddModel extends ChangeNotifier {
         timeText: timeText,
         memoText: memoText,
         isOn: isOn ? 1 : 0,
-        notificationTime: notificationTime);
+        notificationTime: isOn ? notificationTime : "");
     //データベースに保存する
     await _insert(calendarSave);
   }
