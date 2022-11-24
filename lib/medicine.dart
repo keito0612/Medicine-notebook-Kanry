@@ -13,7 +13,7 @@ class Medicine {
       required this.image});
 
   /// Map型に変換
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> fromMap() {
     return {
       'id': id,
       'hospitalText': hospitalText,
@@ -24,7 +24,7 @@ class Medicine {
   }
 
   /// JSONオブジェクトを代入
-  Medicine.fromMap(Map json)
+  Medicine.toJson(Map json)
       : id = json['id'],
         hospitalText = json['hospitalText'],
         examinationText = json['examinationText'],
