@@ -60,7 +60,6 @@ class CalendarEditModel extends ChangeNotifier {
     notificationId = Random().nextInt(10000);
     final db = await DBProvider.db.database;
     var res = await db.query('event');
-    print('data:$res');
     notificationIdList != null
         ? res.map((data) => Event.fromMap(data).notificationId!).toList()
         : null;
@@ -113,6 +112,7 @@ class CalendarEditModel extends ChangeNotifier {
   Future _setNotify({int? id, DateTime? time}) async {
     final scheduleTime = tz.TZDateTime(
         tz.local, time!.year, time.month, time.day, time.hour, time.minute);
+    final now = DateTime.now();
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     const IOSNotificationDetails iOSPlatformChannelSpecifics =
@@ -122,15 +122,17 @@ class CalendarEditModel extends ChangeNotifier {
       iOS: iOSPlatformChannelSpecifics,
       android: null,
     );
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-        id!,
-        'お薬手アプリKanry',
-        ' $notificationTime後に 以下の予定があります。\n$titleText',
-        scheduleTime,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+    if (scheduleTime.isAfter(now)) {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+          id!,
+          'お薬手アプリKanry',
+          ' ${notificationTime!.replaceAll("前", "")}後に以下の予定があります.$titleText',
+          scheduleTime,
+          platformChannelSpecifics,
+          androidAllowWhileIdle: true,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime);
+    }
   }
 
   //既存の通知設定をキャンセルする
@@ -165,7 +167,7 @@ class CalendarEditModel extends ChangeNotifier {
         timeText: timeText,
         memoText: memoText,
         isOn: isOn! ? 1 : 0,
-        notificationTime: notificationTime);
+        notificationTime: isOn! ? notificationTime : "");
     await _update(calendarUpdate);
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:medicine/calendar_edit_model.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class CalendarEditPage extends StatelessWidget {
   CalendarEditPage(this.id, this.notificationId, this.titleText, this.timeText,
@@ -29,6 +30,8 @@ class CalendarEditPage extends StatelessWidget {
     '３日'
   ];
   final selectTime = DateTime.now();
+  final todayTime = DateTime.now();
+  final dateFormat = DateFormat('yyyy/MM/dd(E) HH:mm', "ja");
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<CalendarEditModel>(
@@ -125,6 +128,9 @@ class CalendarEditPage extends StatelessWidget {
                                         ),
                                         Expanded(
                                           child: CupertinoDatePicker(
+                                            minimumDate: DateTime.now()
+                                                .subtract(
+                                                    const Duration(days: 1)),
                                             initialDateTime: selectTime,
                                             use24hFormat: true,
                                             mode: CupertinoDatePickerMode
@@ -225,8 +231,6 @@ class CalendarEditPage extends StatelessWidget {
                                                   .toList(),
                                               onSelectedItemChanged:
                                                   (int index) {
-                                                print(notificationTimebars[
-                                                    index]);
                                                 model.settingNotification(
                                                     notificationTimebars[
                                                         index]);
@@ -350,7 +354,7 @@ class CalendarEditPage extends StatelessWidget {
                         child: ElevatedButton(
                             child: const Text('更新'),
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.pink[100],
+                              backgroundColor: Colors.pink[100],
                             ),
                             onPressed: () async {
                               //お薬手帳を追加する
