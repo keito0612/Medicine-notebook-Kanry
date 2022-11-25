@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:medicine/db_provider.dart';
+import 'package:medicine/Common/db_provider.dart';
 import 'package:medicine/view/list_page.dart' as meunitem;
-import 'package:medicine/medicine.dart';
+import 'package:medicine/model/medicine.dart';
 
 class ListModel extends ChangeNotifier {
   bool loading = false;

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:medicine/calendar_add_model.dart';
+import 'package:medicine/view_model/calendar_add_model.dart';
 import 'package:provider/provider.dart';
 
 class CalendarAddDate extends StatelessWidget {

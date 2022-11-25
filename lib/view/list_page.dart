@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:medicine/base_helper.dart';
+import 'package:medicine/Common/base_helper.dart';
 import 'package:medicine/view_model/list_model.dart';
-import 'package:medicine/medicine.dart';
-import 'package:medicine/photo.dart';
+import 'package:medicine/model/medicine.dart';
+import 'package:medicine/view/photo.dart';
 import 'package:medicine/view/add_page.dart';
 import 'package:medicine/view/edit_page.dart';
 import 'package:provider/provider.dart';

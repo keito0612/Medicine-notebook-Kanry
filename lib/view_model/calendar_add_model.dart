@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:medicine/db_provider.dart';
-import 'package:medicine/event.dart';
+import 'package:medicine/Common/db_provider.dart';
+import 'package:medicine/model/event.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/date_symbol_data_local.dart';

@@ -1,10 +1,10 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:medicine/calendar_add.dart';
-import 'package:medicine/calendar_edit.dart';
-import 'package:medicine/db_provider.dart';
-import 'package:medicine/event.dart';
+import 'package:medicine/view/calendar_add.dart';
+import 'package:medicine/view/calendar_edit.dart';
+import 'package:medicine/Common/db_provider.dart';
+import 'package:medicine/model/event.dart';
 import 'package:table_calendar/table_calendar.dart';
 import "package:intl/intl.dart";
 import 'package:intl/date_symbol_data_local.dart';

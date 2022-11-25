@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
-import 'package:medicine/db_provider.dart';
-import 'package:medicine/event.dart';
+import 'package:medicine/Common/db_provider.dart';
+import 'package:medicine/model/event.dart';
 import 'package:sqflite/sqflite.dart';
 import "package:intl/intl.dart";
 import 'package:timezone/timezone.dart' as tz;

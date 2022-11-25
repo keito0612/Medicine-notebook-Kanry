@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:medicine/base_helper.dart';
-import 'package:medicine/db_provider.dart';
-import 'package:medicine/file_conroller.dart';
-import 'package:medicine/medicine.dart';
+import 'package:medicine/Common/base_helper.dart';
+import 'package:medicine/Common/db_provider.dart';
+import 'package:medicine/Common/file_conroller.dart';
+import 'package:medicine/model/medicine.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
