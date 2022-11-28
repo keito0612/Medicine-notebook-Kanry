@@ -16,14 +16,16 @@ enum SortItem {
 
 class ListPage extends StatelessWidget {
   String searchText = "";
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ListModel>(
         create: (_) => ListModel()..getList(),
         child: Consumer<ListModel>(builder: (context, model, child) {
+          isLoading = true;
           BannerAd myBanner = BannerAd(
               adUnitId: model.getTestAdBannerUnitId(),
-              size: AdSize.banner,
+              size: AdSize.fullBanner,
               request: const AdRequest(),
               listener: BannerAdListener(
                 onAdLoaded: (Ad ad) => debugPrint('Ad loaded.'),
@@ -34,6 +36,7 @@ class ListPage extends StatelessWidget {
                 onAdClosed: (Ad ad) => debugPrint('Ad closed.'),
               ));
           myBanner.load();
+          isLoading = false;
           return Stack(
             children: [
               Scaffold(
@@ -260,7 +263,7 @@ class ListPage extends StatelessWidget {
                         );
                       }
                     }),
-                    adBanner(myBanner)
+                    adBanner(myBanner),
                   ],
                 ),
                 floatingActionButton: Consumer<ListModel>(
@@ -290,7 +293,7 @@ class ListPage extends StatelessWidget {
                   },
                 ),
               ),
-              if (model.loading) showIndicator(context)
+              if (model.loading == true) showIndicator(context)
             ],
           );
         }));
@@ -345,13 +348,19 @@ class ListPage extends StatelessWidget {
   }
 
   //広告バナー
-  Widget adBanner(BannerAd myBanner) {
-    return Container(
-      color: Colors.white,
-      height: 64.0,
-      width: double.infinity,
-      child: AdWidget(ad: myBanner),
-    );
+  Widget adBanner(BannerAd bannerAd) {
+    return isLoading == true
+        ? Container(
+            color: Colors.white,
+            height: 64.0,
+            width: double.infinity,
+            child: const Center(child: CircularProgressIndicator()))
+        : Container(
+            color: Colors.white,
+            height: 64.0,
+            width: double.infinity,
+            child: AdWidget(ad: bannerAd),
+          );
   }
 
   //削除ダイアログ
