@@ -9,10 +9,12 @@ class ListModel extends ChangeNotifier {
   List<Medicine> searchList = [];
 
   Future getList() async {
+    isLoading();
     final db = await DBProvider.db.database;
     var res = await db.query('medicine');
     //データの読み込み
     medicineList = res.map((data) => Medicine.toJson(data)).toList();
+    isReloading();
     notifyListeners();
   }
 
@@ -61,7 +63,6 @@ class ListModel extends ChangeNotifier {
     String testBannerUnitId = "";
     testBannerUnitId =
         "ca-app-pub-3940256099942544/2934735716"; // iOSのデモ用バナー広告ID
-
     return testBannerUnitId;
   }
 

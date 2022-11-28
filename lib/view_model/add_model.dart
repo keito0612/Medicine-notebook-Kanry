@@ -29,7 +29,7 @@ class AddModel extends ChangeNotifier {
       if (index != null) {
         //DBに保存するために保存先のパスを作る
         imageFileList[index] = await FileController.getImagePath(_pickedFile!);
-        ;
+
         //DBへ保存するため、base64文字列へ変換する
         base64ImageStringList[index] =
             Base64Helper().base64String(imageFileList[index].readAsBytesSync());

@@ -81,7 +81,6 @@ class CalendarAddModel extends ChangeNotifier {
     final scheduleTime = tz.TZDateTime(
         tz.local, time!.year, time.month, time.day, time.hour, time.minute);
     final now = DateTime.now();
-    final presentTime = formatter.format(now);
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
     const IOSNotificationDetails iOSPlatformChannelSpecifics =
